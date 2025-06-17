@@ -101,5 +101,7 @@ Escalable: se pueden añadir nuevas entidades fácilmente.
 
 Uso de interfaces fomenta el principio de programación orientada a contratos.
 
+Finalmente, se diseño esta plantilla modular para FastAPI siguiendo los principios de diseño SOLID y con una estructura inspirada en el Domain-Driven Design (DDD), una filosofía de desarrollo que propone modelar el software en torno al dominio del negocio, organizando el código por capas como entidades, servicios, repositorios e interfaces. Esto me permitió garantizar un código limpio, flexible y fácil de mantener. La clara separación de responsabilidades, el uso de interfaces específicas y la inyección de dependencias aseguran que el sistema sea escalable y desacoplado. Además, esta arquitectura facilita la creación de pruebas unitarias, ya que permite usar implementaciones falsas (mocks o fakes) para aislar la lógica de negocio y probar cada componente de forma independiente. En la carpeta llamada pruebas se incluyen dos ejemplos: uno con tres pruebas unitarias y otro con una prueba de integración contra la base de datos. Entiendo que actualmente puede que no se realicen pruebas, pero si en un futuro la compañía decide implementarlas, estos ejemplos sirven como evidencia de que esta arquitectura permite hacerlo sin problemas. Esto no solo mejora la calidad del código, sino que también acelera el desarrollo y reduce riesgos en futuros cambios.
+
 🧑‍💻 Autor
 Desarrollado por Juan Esteban Valdés Ospina ✨

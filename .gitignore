@@ -69,3 +69,5 @@ __pydantic__/
 
 .idea
 
+.pytest_cache
+
