@@ -21,6 +21,9 @@ fast_api_plantilla/
 ├── .env                      # Variables de entorno (credenciales, configuración)
 ├── .gitignore
 ```
+
+![image](https://github.com/user-attachments/assets/88097417-6617-40dd-be80-4003c0d9c72c)
+
 ## 🧠 Arquitectura y Conocimientos Técnicos Aplicados
 ### ✅ main.py
 Archivo raíz del proyecto.
