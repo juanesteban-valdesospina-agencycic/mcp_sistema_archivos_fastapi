@@ -9,6 +9,7 @@ fast_api_plantilla/
 │   ├── interfaces/           # Definición de interfaces (abstracción del acceso a datos)
 │   └── *.py                  # Implementación concreta de cada repositorio por entidad
 ├── servicios/
+|   ├──interfaces/            #Definición de interfaces (abstracción de la lógica de negocio)
 │   └── *.py                  # Lógica de negocio de cada entidad
 ├── modelos/
 │   └── *.py                  # Definición de entidades (espejo de las tablas de BD, sin ORM)
