@@ -42,7 +42,7 @@ Cada implementación concreta gestiona directamente la conexión a la base de da
 Aplica el principio de inversión de dependencias (Dependency Inversion).
 
 ### ✅ servicios/
-Implementan la lógica de negocio de cada entidad.
+Contienen interfaces (contratos) que definen los métodos necesarios para cada Servicio.
 
 Consumidos por los routers mediante inyección de dependencias.
 
