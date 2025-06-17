@@ -22,7 +22,8 @@ fast_api_plantilla/
 ├── .gitignore
 ```
 
-![image](https://github.com/user-attachments/assets/88097417-6617-40dd-be80-4003c0d9c72c)
+![image](https://github.com/user-attachments/assets/70703ec4-bf78-4328-b0f0-68e03fc607a1)
+
 
 ## 🧠 Arquitectura y Conocimientos Técnicos Aplicados
 ### ✅ main.py
