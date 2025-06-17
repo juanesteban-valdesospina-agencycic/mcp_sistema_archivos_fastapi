@@ -1,7 +1,8 @@
 from repositorios.interfaces.usuario import IRepositorioUsuario
 from esquemas.usuario import CrearUsuario, RespuestaUsuario
+from servicios.interfaces.usuario import IServicioUsuario
 
-class ServicioUsuario:
+class ServicioUsuario(IServicioUsuario):
     def __init__(self, repositorio: IRepositorioUsuario):
         self.repositorio = repositorio
 

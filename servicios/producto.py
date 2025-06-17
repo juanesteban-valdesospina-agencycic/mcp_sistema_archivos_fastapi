@@ -2,9 +2,10 @@ from typing import List
 
 from repositorios.interfaces.producto import IRepositorioProducto
 from esquemas.producto import CrearProducto, RespuestaProducto
+from servicios.interfaces.producto import IServicioProducto
 
 
-class ServicioProducto:
+class ServicioProducto(IServicioProducto):
     def __init__(self, repositorio: IRepositorioProducto):
         self.repositorio = repositorio
 
