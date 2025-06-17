@@ -1,0 +1,69 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Environment variables
+.env
+.env.*
+
+# PyInstaller
+*.spec
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# MySQL dump files
+*.sql
+*.sql.gz
+*.dump
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints
+
+# MyPy / Pyright
+.mypy_cache/
+.pyright/
+
+# pytest
+.cache/
+*.cover
+coverage.xml
+htmlcov/
+
+# FastAPI specific (if you use static or media folders)
+static/
+media/
+
+# Uvicorn log files (if logged to file)
+uvicorn.log
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# __init__.py (if you don't want to track empty ones)
+# !**/__init__.py
+
+# Pydantic generated cache (if using compiled models)
+__pydantic__/
+
