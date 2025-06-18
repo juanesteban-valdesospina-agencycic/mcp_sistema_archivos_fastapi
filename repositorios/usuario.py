@@ -7,6 +7,8 @@ class RepositorioUsuario(IRepositorioUsuario):
         self.conn = conn
         self.cursor = cursor
 
+    from datetime import datetime
+
     def insertar_usuario(self, usuario: CrearUsuario) -> RespuestaUsuario:
         try:
             sql = """
@@ -18,11 +20,21 @@ class RepositorioUsuario(IRepositorioUsuario):
             self.conn.commit()
             nuevo_id = self.cursor.lastrowid
 
+            # Obtener fecha_creacion del usuario insertado
+            sql_select = "SELECT fecha_creacion FROM usuarios WHERE id = %s"
+            self.cursor.execute(sql_select, (nuevo_id,))
+            fila = self.cursor.fetchone()
+            fecha_creacion = fila['fecha_creacion'] if fila else None
+
             return RespuestaUsuario(
                 id=nuevo_id,
                 nombre_usuario=usuario.nombre_usuario,
-                correo_electronico=usuario.correo_electronico
+                correo_electronico=usuario.correo_electronico,
+                fecha_creacion=fecha_creacion
             )
+        except Exception as e:
+            self.conn.rollback()
+            raise e
         finally:
             self.cursor.close()
             self.conn.close()
@@ -40,6 +52,9 @@ class RepositorioUsuario(IRepositorioUsuario):
                     fecha_creacion=usuario['fecha_creacion']
                 ) for usuario in usuarios
             ]
+        except Exception as e:
+            self.conn.rollback()
+            raise e
         finally:
             self.cursor.close()
             self.conn.close()

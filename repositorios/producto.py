@@ -20,6 +20,9 @@ class RepositorioProducto(IRepositorioProducto):
             self.cursor.execute("SELECT * FROM productos WHERE id = %s", (nuevo_id,))
             fila = self.cursor.fetchone()
             return RespuestaProducto(**fila)
+        except Exception as e:
+            self.conn.rollback()
+            raise e
         finally:
             self.cursor.close()
             self.conn.close()
@@ -34,6 +37,9 @@ class RepositorioProducto(IRepositorioProducto):
                 raise ValueError(f"No se encontró un producto con id {id_producto}")
 
             return RespuestaProducto(**fila)
+        except Exception as e:
+            self.conn.rollback()
+            raise e
         finally:
             self.cursor.close()
             self.conn.close()
@@ -45,6 +51,9 @@ class RepositorioProducto(IRepositorioProducto):
             filas = self.cursor.fetchall()
 
             return [RespuestaProducto(**fila) for fila in filas]
+        except Exception as e:
+            self.conn.rollback()
+            raise e
         finally:
             self.cursor.close()
             self.conn.close()
