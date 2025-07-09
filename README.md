@@ -1,107 +1,229 @@
-# ⚙️ FastAPI Plantilla Modular
-Este proyecto es una plantilla base para backend con FastAPI, diseñada con una arquitectura limpia, modular y desacoplada. No se utiliza un ORM, pero se siguen principios que facilitan el mantenimiento, escalabilidad y testeo del sistema.
+# 📁 MCP Sistema de Archivos FastAPI
+
+Un servidor Model Context Protocol (MCP) construido con FastAPI que proporciona operaciones seguras de sistema de archivos para integraciones con Claude Desktop y otros clientes MCP compatibles.
+
+## 🎯 ¿Qué es este proyecto?
+
+Este proyecto implementa un servidor MCP (Model Context Protocol) que permite a Claude Desktop y otros clientes compatibles realizar operaciones de sistema de archivos de manera segura y controlada. El servidor está construido con FastAPI y sigue una arquitectura limpia y modular.
+
+### ¿Qué es MCP?
+
+Model Context Protocol (MCP) es un protocolo estándar que permite a los modelos de IA acceder a recursos externos de manera segura. En este caso, proporciona acceso controlado al sistema de archivos local.
+
+## ✨ Características
+
+- 🔒 **Operaciones seguras**: Todas las operaciones están limitadas a directorios específicos autorizados
+- 📂 **Gestión completa de archivos**: Crear, leer, actualizar, eliminar archivos y directorios
+- 🔍 **Búsqueda de archivos**: Buscar archivos por nombre, extensión o contenido
+- 📊 **Metadatos**: Obtener información detallada de archivos (tamaño, fecha, permisos)
+- 🏗️ **Arquitectura modular**: Código organizado con separación clara de responsabilidades
+- 🔌 **Compatible con MCP**: Integración nativa con Claude Desktop y otros clientes MCP
+- 📋 **Validación robusta**: Esquemas Pydantic para validación de entrada y salida
+- ⚡ **Alto rendimiento**: Construido con FastAPI para máxima velocidad
 
 ## 📁 Estructura del Proyecto
+
 ```
-fast_api_plantilla/
-├── main.py                   # Punto de entrada de la aplicación
-├── repositorios/
-│   ├── interfaces/           # Definición de interfaces (abstracción del acceso a datos)
-│   └── *.py                  # Implementación concreta de cada repositorio por entidad
-├── servicios/
-|   ├──interfaces/            #Definición de interfaces (abstracción de la lógica de negocio)
-│   └── *.py                  # Lógica de negocio de cada entidad
-├── modelos/
-│   └── *.py                  # Definición de entidades (espejo de las tablas de BD, sin ORM)
-├── esquemas/
-│   └── *.py                  # DTOs (schemas de entrada/salida) por entidad
+mcp_sistema_archivos_fastapi/
+├── main.py                     # Punto de entrada de la aplicación MCP
 ├── enrutadores/
-│   └── *.py                  # Routers (capa de presentación) con inyección de dependencias
-├── dependencias.py           # Registro de servicios e inyección mediante Depends()
-├── db.py                     # Lógica para obtener conexión a la base de datos
-├── .env                      # Variables de entorno (credenciales, configuración)
-├── .gitignore
+│   ├── crear.py               # Endpoints para crear archivos/directorios
+│   ├── obtener.py             # Endpoints para leer y buscar archivos
+│   ├── actualizar.py          # Endpoints para modificar archivos
+│   └── eliminar.py            # Endpoints para eliminar archivos/directorios
+├── servicios/
+│   ├── interfaces/            # Interfaces de servicios
+│   └── archivo_servicio.py    # Lógica de negocio para operaciones de archivos
+├── esquemas/
+│   ├── archivo.py             # Esquemas para operaciones de archivos
+│   └── directorio.py          # Esquemas para operaciones de directorios
+├── modelos/
+│   ├── archivo.py             # Modelo de entidad archivo
+│   └── directorio.py          # Modelo de entidad directorio
+├── dependencias.py            # Inyección de dependencias
+├── configuracion.py           # Configuración de seguridad y rutas permitidas
+└── requirements.txt           # Dependencias del proyecto
 ```
 
-![image](https://github.com/user-attachments/assets/70703ec4-bf78-4328-b0f0-68e03fc607a1)
+## 🔧 Instalación y Configuración
 
+### Prerrequisitos
+- Python 3.8 o superior
+- pip (gestor de paquetes de Python)
 
-## 🧠 Arquitectura y Conocimientos Técnicos Aplicados
-### ✅ main.py
-Archivo raíz del proyecto.
+### Pasos de instalación
 
-Crea la instancia FastAPI.
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/juanesteban-valdesospina-agencycic/mcp_sistema_archivos_fastapi.git
+   cd mcp_sistema_archivos_fastapi
+   ```
 
-Registra los routers de la capa de presentación.
+2. **Crear entorno virtual** (recomendado)
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # En Windows: venv\Scripts\activate
+   ```
 
-### ✅ repositorios/
-Contienen interfaces (contratos) que definen los métodos necesarios para cada entidad.
+3. **Instalar dependencias**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Cada implementación concreta gestiona directamente la conexión a la base de datos (extracción, inserción, etc.).
+4. **Configurar variables de entorno**
+   
+   Crear archivo `.env` en la raíz del proyecto:
+   ```env
+   # Configuración de seguridad
+   ALLOWED_DIRECTORIES=/ruta/permitida1,/ruta/permitida2
+   MAX_FILE_SIZE=10485760  # 10MB en bytes
+   ALLOWED_EXTENSIONS=.txt,.md,.py,.json,.csv,.log
+   
+   # Configuración del servidor
+   HOST=127.0.0.1
+   PORT=8000
+   DEBUG=true
+   ```
 
-Aplica el principio de inversión de dependencias (Dependency Inversion).
+## 🚀 Uso
 
-### ✅ servicios/
-Contienen interfaces (contratos) que definen los métodos necesarios para cada Servicio.
+### Iniciar el servidor
+```bash
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
 
-Consumidos por los routers mediante inyección de dependencias.
+### Configurar con Claude Desktop
 
-Separan reglas del negocio del acceso a datos y de la presentación.
+Agregar la siguiente configuración al archivo de configuración de Claude Desktop:
 
-### ✅ modelos/
-Representan las entidades del sistema.
+```json
+{
+  "mcpServers": {
+    "file-system": {
+      "command": "uvicorn",
+      "args": ["main:app", "--host", "127.0.0.1", "--port", "8000"],
+      "cwd": "/ruta/al/proyecto/mcp_sistema_archivos_fastapi"
+    }
+  }
+}
+```
 
-Aunque no se usa ORM, sirven como un espejo de las tablas de la base de datos para mantener el código organizado y coherente.
+## 📚 API Endpoints
 
-### ✅ esquemas/
-Cada entidad tiene su archivo .py correspondiente.
+### Archivos
 
-Se definen los esquemas de entrada y salida utilizando Pydantic.
+- **POST** `/archivos/crear` - Crear un nuevo archivo
+- **GET** `/archivos/{ruta}` - Leer contenido de un archivo
+- **PUT** `/archivos/{ruta}` - Actualizar contenido de un archivo
+- **DELETE** `/archivos/{ruta}` - Eliminar un archivo
+- **GET** `/archivos/buscar` - Buscar archivos por criterios
 
-Facilitan validación automática y documentación de la API.
+### Directorios
 
-### ✅ dependencias.py
-Centraliza la lógica de inyección de dependencias.
+- **POST** `/directorios/crear` - Crear un nuevo directorio
+- **GET** `/directorios/{ruta}` - Listar contenido de un directorio
+- **DELETE** `/directorios/{ruta}` - Eliminar un directorio
+- **GET** `/directorios/buscar` - Buscar directorios
 
-Define cómo obtener instancias de servicios y repositorios usando Depends() de FastAPI.
+### Metadatos
 
-### ✅ enrutadores/
-Exponen las rutas de la API organizadas por entidad.
+- **GET** `/metadatos/{ruta}` - Obtener información detallada de un archivo/directorio
 
-Se inyectan los servicios necesarios desde dependencias.py con Depends().
+## 🔒 Seguridad
 
-### ✅ db.py
-Lógica de conexión a base de datos (MySQL o similar).
+### Características de seguridad implementadas:
 
-Devuelve la conexión y cursor necesarios para ejecutar consultas sin ORM.
+- **Rutas restringidas**: Solo se permite acceso a directorios específicos configurados
+- **Validación de rutas**: Prevención de path traversal attacks (../, ..\)
+- **Límites de tamaño**: Restricciones en el tamaño máximo de archivos
+- **Extensiones permitidas**: Lista blanca de extensiones de archivo permitidas
+- **Sanitización de entrada**: Validación estricta de todos los parámetros de entrada
 
-## 🔐 Variables de entorno (.env)
-Ejemplo:
+### Configuración de seguridad recomendada:
 
-DB_HOST=localhost  
-DB_USER=usuario  
-DB_PASSWORD=contraseña  
-DB_NAME=nombre_basedatos
+```env
+# Limitar a directorios específicos seguros
+ALLOWED_DIRECTORIES=/home/usuario/documentos,/home/usuario/proyectos
 
-## ▶️ Ejecutar el proyecto
-Instalar dependencias:
+# Limitar tamaño de archivos (10MB)
+MAX_FILE_SIZE=10485760
 
-pip install -r requirements.txt
-Iniciar servidor:
+# Solo permitir extensiones seguras
+ALLOWED_EXTENSIONS=.txt,.md,.py,.json,.csv,.log,.yaml,.yml
+```
 
+## 🧪 Pruebas
 
-uvicorn main:app --reload
+Ejecutar las pruebas unitarias:
+```bash
+python -m pytest pruebas/
+```
 
-## 🎯 Beneficios de esta arquitectura
-Separación clara de responsabilidades (repositorios, servicios, presentación).
+Ejecutar pruebas con cobertura:
+```bash
+python -m pytest --cov=. pruebas/
+```
 
-Facilita pruebas unitarias al tener lógica desacoplada.
+## 📖 Documentación de la API
 
-Escalable: se pueden añadir nuevas entidades fácilmente.
+Una vez que el servidor esté ejecutándose, puedes acceder a:
 
-Uso de interfaces fomenta el principio de programación orientada a contratos.
+- **Documentación interactiva (Swagger)**: http://127.0.0.1:8000/docs
+- **Documentación alternativa (ReDoc)**: http://127.0.0.1:8000/redoc
+- **Esquema OpenAPI**: http://127.0.0.1:8000/openapi.json
 
-Finalmente, se diseño esta plantilla modular para FastAPI siguiendo los principios de diseño SOLID y con una estructura inspirada en el Domain-Driven Design (DDD), una filosofía de desarrollo que propone modelar el software en torno al dominio del negocio, organizando el código por capas como entidades, servicios, repositorios e interfaces. Esto me permitió garantizar un código limpio, flexible y fácil de mantener. La clara separación de responsabilidades, el uso de interfaces específicas y la inyección de dependencias aseguran que el sistema sea escalable y desacoplado. Además, esta arquitectura facilita la creación de pruebas unitarias, ya que permite usar implementaciones falsas (mocks o fakes) para aislar la lógica de negocio y probar cada componente de forma independiente. En la carpeta llamada pruebas se incluyen dos ejemplos: uno con tres pruebas unitarias y otro con una prueba de integración contra la base de datos. Entiendo que actualmente puede que no se realicen pruebas, pero si en un futuro la compañía decide implementarlas, estos ejemplos sirven como evidencia de que esta arquitectura permite hacerlo sin problemas. Esto no solo mejora la calidad del código, sino que también acelera el desarrollo y reduce riesgos en futuros cambios.
+## 🔧 Desarrollo
 
-🧑‍💻 Autor
-Desarrollado por Juan Esteban Valdés Ospina ✨
+### Arquitectura
+
+Este proyecto sigue los principios de **Clean Architecture** y **SOLID**:
+
+- **Separation of Concerns**: Cada capa tiene una responsabilidad específica
+- **Dependency Inversion**: Las dependencias apuntan hacia abstracciones
+- **Interface Segregation**: Interfaces específicas para cada funcionalidad
+- **Single Responsibility**: Cada clase/módulo tiene una única responsabilidad
+
+### Contribuir
+
+1. Fork el proyecto
+2. Crear una rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit los cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crear un Pull Request
+
+## 📋 Requisitos del Sistema
+
+- **Sistema Operativo**: Windows, macOS, Linux
+- **Python**: 3.8 o superior
+- **Memoria RAM**: Mínimo 512MB disponibles
+- **Espacio en disco**: 100MB para instalación básica
+
+## 🚨 Limitaciones y Consideraciones
+
+- Las operaciones están limitadas a directorios configurados por seguridad
+- El tamaño máximo de archivo está limitado por configuración
+- No se permiten operaciones de sistema que puedan comprometer la seguridad
+- Requiere configuración adecuada de permisos de sistema de archivos
+
+## 🤝 Soporte
+
+Si encuentras algún problema o tienes preguntas:
+
+1. Revisa la documentación de la API en `/docs`
+2. Consulta los logs del servidor para diagnóstico
+3. Verifica la configuración de rutas permitidas
+4. Crear un issue en GitHub con detalles del problema
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+---
+
+🧑‍💻 **Desarrollado por**: Juan Esteban Valdés Ospina  
+🏢 **Organización**: Agency CIC  
+📧 **Contacto**: [GitHub Profile](https://github.com/juanesteban-valdesospina-agencycic)  
+
+---
+
+⭐ Si este proyecto te resulta útil, ¡no olvides darle una estrella en GitHub!
