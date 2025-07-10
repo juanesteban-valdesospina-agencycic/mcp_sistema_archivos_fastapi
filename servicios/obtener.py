@@ -1,10 +1,14 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from pathlib import Path
-from typing import List
-from servicios.interfaces.obtener import Obtener
+from typing import List, Optional
+from servicios.interfaces.obtener import IServicioObtener
 
 
-class ObtenerProyectos(Obtener):
-    def obtener_proyectos(self, ruta: str = "/var/www") -> List[dict]:
+class ServicioObtener(IServicioObtener):
+    def obtener_proyectos(self, ruta: str = "/Users/jevdev2304/Documents/CIC") -> List[dict]:
         p = Path(ruta)
         if not p.exists() or not p.is_dir():
             return []
@@ -12,15 +16,18 @@ class ObtenerProyectos(Obtener):
             {"nombre": f.name, "ruta": str(f.resolve())}
             for f in p.iterdir() if f.is_dir()
         ]
-    
-    def obtener_archivos_de_proyecto(self, proyecto: str, profundidad_maxima: int = 10, nivel: int = 0) -> List[dict]:
-        if nivel > profundidad_maxima:
+
+    def obtener_contenido_carpeta(self, ruta_carpeta: str) -> List[dict]:
+        ruta_base = Path("/Users/jevdev2304/Documents/CIC").resolve()
+        carpeta = Path(ruta_carpeta).resolve()
+        try:
+            carpeta.relative_to(ruta_base)
+        except ValueError:
             return []
-        p = Path(proyecto)
-        if not p.exists() or not p.is_dir():
+        if not carpeta.exists() or not carpeta.is_dir():
             return []
         resultado = []
-        for f in p.iterdir():
+        for f in carpeta.iterdir():
             if f.is_file():
                 resultado.append({
                     "nombre": f.name,
@@ -31,11 +38,10 @@ class ObtenerProyectos(Obtener):
                 resultado.append({
                     "nombre": f.name,
                     "ruta": str(f.resolve()),
-                    "tipo": "carpeta",
-                    "contenido": self.obtener_archivos_de_proyecto(str(f), profundidad_maxima, nivel + 1)
+                    "tipo": "carpeta"
                 })
         return resultado
-    
+
     def leer_archivo(self, archivo: str) -> dict:
         p = Path(archivo)
         if not p.exists() or not p.is_file():
@@ -43,3 +49,59 @@ class ObtenerProyectos(Obtener):
         return {"nombre": p.name, "ruta": str(p.resolve()), "contenido": p.read_text()}
 
 
+
+
+    def obtener_estructura_completa_texto(self, ruta_base: Optional[str] = None) -> str:
+        import json
+        """
+        Genera un árbol del directorio dado, ignorando carpetas típicas de entornos Python y Node.
+        Retorna un JSON anidado como string.
+        """
+        if ruta_base is None:
+            ruta_base = os.getenv("CARPETA_RAIZ_PROYECTOS", "/Users/jevdev2304/Documents/CIC")
+        IGNORAR = {"node_modules", ".venv", "venv", "__pycache__", ".git", ".mypy_cache", ".pytest_cache", ".idea", ".vscode"}
+        try:
+            base = Path(ruta_base).resolve(strict=True)
+            if not base.is_dir():
+                return json.dumps({"error": "La ruta proporcionada no es un directorio."})
+        except FileNotFoundError:
+            return json.dumps({"error": "Directorio raíz no existe."})
+        except Exception as e:
+            return json.dumps({"error": f"Error inesperado al acceder a la ruta base: {e}"})
+
+        def seguro_en_base(path: Path) -> bool:
+            try:
+                return path.resolve().is_relative_to(base)
+            except Exception:
+                return False
+
+        def recorrer_arbol_json(directorio: Path):
+            contenido = []
+            try:
+                items = sorted(directorio.iterdir())
+            except Exception:
+                return [{"nombre": "[Acceso denegado o error]", "tipo": "error"}]
+            for path in items:
+                if path.name in IGNORAR:
+                    continue
+                if not seguro_en_base(path):
+                    continue
+                if path.is_dir():
+                    contenido.append({
+                        "nombre": path.name,
+                        "tipo": "carpeta",
+                        "contenido": recorrer_arbol_json(path)
+                    })
+                else:
+                    contenido.append({
+                        "nombre": path.name,
+                        "tipo": "archivo"
+                    })
+            return contenido
+
+        estructura = {
+            "nombre": base.name,
+            "tipo": "carpeta",
+            "contenido": recorrer_arbol_json(base)
+        }
+        return json.dumps(estructura, ensure_ascii=False)

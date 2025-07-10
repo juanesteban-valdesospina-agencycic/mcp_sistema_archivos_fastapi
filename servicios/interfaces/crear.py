@@ -1,14 +1,11 @@
 from abc import ABC, abstractmethod
+from fastapi import UploadFile
 
-from typing import List
-
-from esquemas.usuario import CrearUsuario, RespuestaUsuario
-
-class IRepositorioUsuario(ABC):
+class IServicioCrear(ABC):
     @abstractmethod
-    def insertar_usuario(self, usuario: CrearUsuario) -> RespuestaUsuario:
+    def crear_o_sobrescribir_archivo(self, carpeta_destino: str, archivo: UploadFile) -> dict:
         pass
 
     @abstractmethod
-    def obtener_todos_los_usuarios(self) -> List[RespuestaUsuario]:
+    def crear_o_sobrescribir_archivo_texto(self, carpeta_destino: str, nombre_archivo: str, contenido: str) -> dict:
         pass

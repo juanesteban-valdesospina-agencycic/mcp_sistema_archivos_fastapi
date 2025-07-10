@@ -1,33 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException
-from esquemas.usuario import CrearUsuario, RespuestaUsuario
-from servicios.usuario import ServicioUsuario
-from dependencias import obtener_servicio_usuario
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, Body
+from pydantic import BaseModel
+from dependencias import obtener_servicio_crear
+from servicios.interfaces.crear import IServicioCrear
+from pathlib import Path
 
 router = APIRouter(
-    prefix="/usuarios",
-    tags=["Usuarios"]
+    prefix="/crear",
+    tags=["Crear"]
 )
 
-@router.post(
-    "/",
-    response_model=RespuestaUsuario,
-    summary="Crear un nuevo usuario",
-    description="Permite crear un usuario nuevo en el sistema proporcionando los datos requeridos."
-)
-def crear_usuario(usuario: CrearUsuario, servicio: ServicioUsuario = Depends(obtener_servicio_usuario)):
-    try:
-        return servicio.crear_usuario(usuario)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@router.post("/archivo/upload", operation_id="create_or_overwrite_file_using_upload")
+def crear_o_sobrescribir_archivo_upload(
+    carpeta_destino: str = Form(...),
+    archivo: UploadFile = File(...),
+    servicio: IServicioCrear = Depends(obtener_servicio_crear)
+):
+    return servicio.crear_o_sobrescribir_archivo(carpeta_destino, archivo)
 
-@router.get(
-    "/",
-    response_model=list[RespuestaUsuario],
-    summary="Obtener todos los usuarios",
-    description="Devuelve una lista con todos los usuarios registrados en el sistema."
-)
-def obtener_todos_los_usuarios(servicio: ServicioUsuario = Depends(obtener_servicio_usuario)):
-    try:
-        return servicio.obtener_todos_los_usuarios()
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+class ArchivoTextoDTO(BaseModel):
+    carpeta_destino: str
+    nombre_archivo: str
+    contenido: str
+
+@router.post("/archivo/texto", operation_id="create_or_overwrite_file_using_text")
+def crear_o_sobrescribir_archivo_texto(
+    datos: ArchivoTextoDTO = Body(...),
+    servicio: IServicioCrear = Depends(obtener_servicio_crear)
+):
+    return servicio.crear_o_sobrescribir_archivo_texto(
+        datos.carpeta_destino, datos.nombre_archivo, datos.contenido
+    )
