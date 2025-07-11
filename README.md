@@ -1,220 +1,157 @@
-# 📁 MCP Sistema de Archivos FastAPI
+# 🗂️ MCP Sistema de Archivos FastAPI
 
-Un servidor Model Context Protocol (MCP) construido con FastAPI que proporciona operaciones seguras de sistema de archivos para integraciones con Claude Desktop y otros clientes MCP compatibles.
+Un servidor **Model Context Protocol (MCP)** construido con FastAPI que permite a sistemas de IA y usuarios interactuar de forma segura con el sistema de archivos local a través de operaciones REST y MCP.
 
-## 🎯 ¿Qué es este proyecto?
+## 📦 ¿Qué es este proyecto?
 
-Este proyecto implementa un servidor MCP (Model Context Protocol) que permite a Claude Desktop y otros clientes compatibles realizar operaciones de sistema de archivos de manera segura y controlada. El servidor está construido con FastAPI y sigue una arquitectura limpia y modular.
-
-### ¿Qué es MCP?
-
-Model Context Protocol (MCP) es un protocolo estándar que permite a los modelos de IA acceder a recursos externos de manera segura. En este caso, proporciona acceso controlado al sistema de archivos local.
+Este proyecto implementa un servidor MCP que expone operaciones seguras de gestión de archivos y directorios, pensado para integraciones con asistentes de IA (Claude, Copilot, Cursor, etc.) y automatización de tareas de desarrollo.
 
 ## ✨ Características
 
-- 🔒 **Operaciones seguras**: Todas las operaciones están limitadas a directorios específicos autorizados
-- 📂 **Gestión completa de archivos**: Crear, leer, actualizar, eliminar archivos y directorios
-- 🔍 **Búsqueda de archivos**: Buscar archivos por nombre, extensión o contenido
-- 📊 **Metadatos**: Obtener información detallada de archivos (tamaño, fecha, permisos)
-- 🏗️ **Arquitectura modular**: Código organizado con separación clara de responsabilidades
-- 🔌 **Compatible con MCP**: Integración nativa con Claude Desktop y otros clientes MCP
-- 📋 **Validación robusta**: Esquemas Pydantic para validación de entrada y salida
-- ⚡ **Alto rendimiento**: Construido con FastAPI para máxima velocidad
+- 🔒 Operaciones seguras y restringidas a directorios autorizados
+- 📂 CRUD completo de archivos y directorios
+- 🔍 Búsqueda de archivos por nombre, extensión o patrón
+- 📊 Metadatos detallados de archivos
+- 🏗️ Arquitectura limpia y modular (Clean Architecture)
+- 🔌 Integración nativa con MCP y FastAPI
+- 📋 Validación robusta de rutas y entradas
 
 ## 📁 Estructura del Proyecto
 
 ```
-mcp_sistema_archivos_fastapi/
-├── main.py                     # Punto de entrada de la aplicación MCP
-├── enrutadores/
-│   ├── crear.py               # Endpoints para crear archivos/directorios
-│   ├── obtener.py             # Endpoints para leer y buscar archivos
-│   ├── actualizar.py          # Endpoints para modificar archivos
-│   └── eliminar.py            # Endpoints para eliminar archivos/directorios
-├── servicios/
-│   ├── interfaces/            # Interfaces de servicios
-│   └── archivo_servicio.py    # Lógica de negocio para operaciones de archivos
-├── esquemas/
-│   ├── archivo.py             # Esquemas para operaciones de archivos
-│   └── directorio.py          # Esquemas para operaciones de directorios
-├── modelos/
-│   ├── archivo.py             # Modelo de entidad archivo
-│   └── directorio.py          # Modelo de entidad directorio
-├── dependencias.py            # Inyección de dependencias
-├── configuracion.py           # Configuración de seguridad y rutas permitidas
-└── requirements.txt           # Dependencias del proyecto
+mcp_sistema_archivos/
+├── main.py                  # Punto de entrada FastAPI + MCP
+├── dependencias.py          # Inyección de dependencias
+├── enrutadores/             # Routers para endpoints REST
+│   ├── crear.py
+│   ├── obtener.py
+│   ├── actualizar.py
+│   └── eliminar.py
+├── servicios/               # Lógica de negocio
+│   ├── crear.py
+│   ├── obtener.py
+│   ├── eliminar.py
+│   └── interfaces/          # Interfaces (contratos ABC)
+│       ├── crear.py
+│       ├── obtener.py
+│       └── eliminar.py
+├── esquemas/                # Esquemas Pydantic (DTOs)
+│   └── dtos.py
+├── pruebas/                 # Tests unitarios y de integración
+│   ├── integracion/
+│   └── unitarias/
+└── requirements.txt         # Dependencias
 ```
 
-## 🔧 Instalación y Configuración
+## 🚀 Instalación y Configuración
 
 ### Prerrequisitos
 - Python 3.8 o superior
-- pip (gestor de paquetes de Python)
+- pip
 
-### Pasos de instalación
+### Pasos
 
-1. **Clonar el repositorio**
+1. **Clona el repositorio**
    ```bash
    git clone https://github.com/juanesteban-valdesospina-agencycic/mcp_sistema_archivos_fastapi.git
    cd mcp_sistema_archivos_fastapi
    ```
-
-2. **Crear entorno virtual** (recomendado)
+2. **Crea un entorno virtual**
    ```bash
    python -m venv venv
    source venv/bin/activate  # En Windows: venv\Scripts\activate
    ```
-
-3. **Instalar dependencias**
+3. **Instala dependencias**
    ```bash
    pip install -r requirements.txt
    ```
-
-4. **Configurar variables de entorno**
-   
-   Crear archivo `.env` en la raíz del proyecto:
+4. **Configura variables de entorno**
+   Crea un archivo `.env` en la raíz:
    ```env
-   # Configuración de seguridad
-   ALLOWED_DIRECTORIES=/ruta/permitida1,/ruta/permitida2
+   # Carpeta raíz permitida para operaciones
+   CARPETA_RAIZ_PROYECTOS=/Users/jevdev2304/Documents/CIC
+   # Configuración del servidor
+   HOST=0.0.0.0
+   PORT=8000
+   DEBUG=true
    ```
-## 🚀 Uso
+
+## 🎮 Uso
 
 ### Iniciar el servidor
 ```bash
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-## 🔌 **Configuración MCP**
+## 🔌 Configuración MCP
 
-Agregar al archivo `settings.json`:
+Ejemplo para `settings.json` de Claude Desktop o Cursor:
 ```json
 {
   "mcpServers": {
     "file-system": {
       "command": "uvicorn",
-      "args": ["main:app", "--host", "127.0.0.1", "--port", "8000"],
-      "cwd": "/ruta/al/proyecto/mcp_sistema_archivos_fastapi"
+      "args": ["main:app", "--host", "0.0.0.0", "--port", "8000"],
+      "cwd": "/ruta/al/proyecto/mcp_sistema_archivos"
     }
   }
 }
 ```
 
-## 📚 API Endpoints
+## 📚 Endpoints REST Principales
 
 ### Archivos
-
-- **POST** `/archivos/crear` - Crear un nuevo archivo
-- **GET** `/archivos/{ruta}` - Leer contenido de un archivo
-- **PUT** `/archivos/{ruta}` - Actualizar contenido de un archivo
-- **DELETE** `/archivos/{ruta}` - Eliminar un archivo
-- **GET** `/archivos/buscar` - Buscar archivos por criterios
+- **GET** `/obtener/archivos/{ruta:path}` - Leer archivo
+- **POST** `/crear/archivo` - Crear o sobrescribir archivo (texto o upload)
+- **PUT** `/actualizar/archivo` - Actualizar archivo existente
+- **DELETE** `/eliminar/archivo` - Eliminar archivo
+- **GET** `/obtener/buscar` - Buscar archivos por patrón
 
 ### Directorios
-
-- **POST** `/directorios/crear` - Crear un nuevo directorio
-- **GET** `/directorios/{ruta}` - Listar contenido de un directorio
-- **DELETE** `/directorios/{ruta}` - Eliminar un directorio
-- **GET** `/directorios/buscar` - Buscar directorios
+- **GET** `/obtener/carpeta` - Listar contenido de un directorio
+- **POST** `/crear/carpeta` - Crear nuevo directorio
+- **DELETE** `/eliminar/carpeta` - Eliminar directorio
 
 ### Metadatos
-
-- **GET** `/metadatos/{ruta}` - Obtener información detallada de un archivo/directorio
+- **GET** `/obtener/metadatos` - Obtener información detallada de archivo/directorio
 
 ## 🔒 Seguridad
 
-### Características de seguridad implementadas:
-
-- **Rutas restringidas**: Solo se permite acceso a directorios específicos configurados
-- **Validación de rutas**: Prevención de path traversal attacks (../, ..\)
-- **Límites de tamaño**: Restricciones en el tamaño máximo de archivos
-- **Extensiones permitidas**: Lista blanca de extensiones de archivo permitidas
-- **Sanitización de entrada**: Validación estricta de todos los parámetros de entrada
-
-### Configuración de seguridad recomendada:
-
-```env
-# Limitar a directorios específicos seguros
-ALLOWED_DIRECTORIES=/home/usuario/documentos,/home/usuario/proyectos
-
-# Limitar tamaño de archivos (10MB)
-MAX_FILE_SIZE=10485760
-
-# Solo permitir extensiones seguras
-ALLOWED_EXTENSIONS=.txt,.md,.py,.json,.csv,.log,.yaml,.yml
-```
+- Todas las rutas se validan para evitar path traversal y acceso fuera de la carpeta raíz
+- Solo se permiten operaciones dentro de `CARPETA_RAIZ_PROYECTOS`
+- Validación estricta de parámetros y extensiones
+- Manejo robusto de errores y respuestas HTTP
 
 ## 🧪 Pruebas
 
-Ejecutar las pruebas unitarias:
+Ejecuta los tests unitarios y de integración:
 ```bash
 python -m pytest pruebas/
 ```
 
-Ejecutar pruebas con cobertura:
-```bash
-python -m pytest --cov=. pruebas/
-```
+## 🛠️ Arquitectura
 
-## 📖 Documentación de la API
+- **Clean Architecture**: separación de routers, servicios, interfaces y esquemas
+- **Interfaces**: implementadas como ABCs en `servicios/interfaces/`
+- **Servicios**: lógica de negocio desacoplada de FastAPI
+- **Routers**: definen los endpoints REST y delegan en servicios
 
-Una vez que el servidor esté ejecutándose, puedes acceder a:
+## 🤝 Contribución
 
-- **Documentación interactiva (Swagger)**: http://127.0.0.1:8000/docs
-- **Documentación alternativa (ReDoc)**: http://127.0.0.1:8000/redoc
-- **Esquema OpenAPI**: http://127.0.0.1:8000/openapi.json
+1. Haz fork del repo
+2. Crea una rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Implementa cambios siguiendo la arquitectura existente
+4. Agrega tests para nuevas funcionalidades
+5. Haz commit y push
+6. Crea un Pull Request
 
-## 🔧 Desarrollo
+## 📞 Soporte y Contacto
 
-### Arquitectura
-
-Este proyecto sigue los principios de **Clean Architecture** y **SOLID**:
-
-- **Separation of Concerns**: Cada capa tiene una responsabilidad específica
-- **Dependency Inversion**: Las dependencias apuntan hacia abstracciones
-- **Interface Segregation**: Interfaces específicas para cada funcionalidad
-- **Single Responsibility**: Cada clase/módulo tiene una única responsabilidad
-
-### Contribuir
-
-1. Fork el proyecto
-2. Crear una rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit los cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear un Pull Request
-
-## 📋 Requisitos del Sistema
-
-- **Sistema Operativo**: Windows, macOS, Linux
-- **Python**: 3.8 o superior
-- **Memoria RAM**: Mínimo 512MB disponibles
-- **Espacio en disco**: 100MB para instalación básica
-
-## 🚨 Limitaciones y Consideraciones
-
-- Las operaciones están limitadas a directorios configurados por seguridad
-- El tamaño máximo de archivo está limitado por configuración
-- No se permiten operaciones de sistema que puedan comprometer la seguridad
-- Requiere configuración adecuada de permisos de sistema de archivos
-
-## 🤝 Soporte
-
-Si encuentras algún problema o tienes preguntas:
-
-1. Revisa la documentación de la API en `/docs`
-2. Consulta los logs del servidor para diagnóstico
-3. Verifica la configuración de rutas permitidas
-4. Crear un issue en GitHub con detalles del problema
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+- **Desarrollador**: Juan Esteban Valdés Ospina
+- **Organización**: Agency CIC
+- **GitHub**: [@juanesteban-valdesospina-agencycic](https://github.com/juanesteban-valdesospina-agencycic)
+- **Email**: juan.valdes@agencycic.com
 
 ---
 
-🧑‍💻 **Desarrollado por**: Juan Esteban Valdés Ospina  
-🏢 **Organización**: Agency CIC  
-📧 **Contacto**: [GitHub Profile](https://github.com/juanesteban-valdesospina-agencycic)  
-
----
-
-⭐ Si este proyecto te resulta útil, ¡no olvides darle una estrella en GitHub!
+⭐ Si este proyecto te resulta útil, ¡dale una estrella en GitHub!
