@@ -30,3 +30,14 @@ def crear_o_sobrescribir_archivo_texto(
     return servicio.crear_o_sobrescribir_archivo_texto(
         datos.carpeta_destino, datos.nombre_archivo, datos.contenido
     )
+
+class RenombrarArchivoDTO(BaseModel):
+    ruta_actual: str
+    nuevo_nombre: str
+
+@router.post("/archivo/renombrar", operation_id="rename_file_by_path")
+def renombrar_archivo(
+    datos: RenombrarArchivoDTO = Body(...),
+    servicio: IServicioCrear = Depends(obtener_servicio_crear)
+):
+    return servicio.renombrar_archivo(datos.ruta_actual, datos.nuevo_nombre)

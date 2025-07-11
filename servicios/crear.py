@@ -44,3 +44,19 @@ class ServicioCrear(IServicioCrear):
             return {"mensaje": "Archivo creado/sobrescrito exitosamente", "ruta": str(destino)}
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error al guardar el archivo: {e}")
+
+    def renombrar_archivo(self, ruta_actual: str, nuevo_nombre: str) -> dict:
+        ruta_base = Path(os.getenv("CARPETA_RAIZ_PROYECTOS", "/Users/jevdev2304/Documents/CIC")).resolve()
+        archivo = Path(ruta_actual).resolve()
+        if not archivo.exists():
+            return {"error": "El archivo o carpeta no existe"}
+        try:
+            archivo.relative_to(ruta_base)
+        except Exception:
+            return {"error": "No tienes permiso para modificar fuera de la carpeta de proyectos."}
+        nuevo_path = archivo.parent / nuevo_nombre
+        try:
+            archivo.rename(nuevo_path)
+            return {"mensaje": "Archivo renombrado exitosamente", "nueva_ruta": str(nuevo_path)}
+        except Exception as e:
+            return {"error": f"Error al renombrar: {e}"}

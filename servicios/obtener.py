@@ -48,7 +48,33 @@ class ServicioObtener(IServicioObtener):
             return {"nombre": p.name, "ruta": str(p.resolve()), "contenido": None}
         return {"nombre": p.name, "ruta": str(p.resolve()), "contenido": p.read_text()}
 
+    def buscar_archivo(self, nombre: Optional[str] = None, extension: Optional[str] = None) -> List[dict]:
+        ruta_base = Path(os.getenv("CARPETA_RAIZ_PROYECTOS", "/Users/jevdev2304/Documents/CIC")).resolve()
+        resultados = []
+        for root, dirs, files in os.walk(ruta_base):
+            for file in files:
+                if nombre and nombre not in file:
+                    continue
+                if extension and not file.endswith(extension):
+                    continue
+                resultados.append({
+                    "nombre": file,
+                    "ruta": str(Path(root) / file)
+                })
+        return resultados
 
+    def metadatos_archivo(self, ruta: str) -> dict:
+        p = Path(ruta)
+        if not p.exists():
+            return {"error": "El archivo no existe"}
+        stat = p.stat()
+        return {
+            "nombre": p.name,
+            "ruta": str(p.resolve()),
+            "tamano": stat.st_size,
+            "ultima_modificacion": stat.st_mtime,
+            "tipo": "carpeta" if p.is_dir() else "archivo"
+        }
 
 
     def obtener_estructura_completa_texto(self, ruta_base: Optional[str] = None) -> str:

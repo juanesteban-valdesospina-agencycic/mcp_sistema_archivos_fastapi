@@ -9,3 +9,7 @@ class IServicioCrear(ABC):
     @abstractmethod
     def crear_o_sobrescribir_archivo_texto(self, carpeta_destino: str, nombre_archivo: str, contenido: str) -> dict:
         pass
+
+    @abstractmethod
+    def renombrar_archivo(self, ruta_actual: str, nuevo_nombre: str) -> dict:
+        pass

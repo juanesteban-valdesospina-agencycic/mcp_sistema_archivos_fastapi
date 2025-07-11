@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 class IServicioObtener(ABC):
     @abstractmethod
@@ -12,6 +12,14 @@ class IServicioObtener(ABC):
     
     @abstractmethod
     def leer_archivo(self, archivo: str) -> dict:
+        pass
+
+    @abstractmethod
+    def buscar_archivo(self, nombre: Optional[str] = None, extension: Optional[str] = None) -> List[dict]:
+        pass
+
+    @abstractmethod
+    def metadatos_archivo(self, ruta: str) -> dict:
         pass
 
     @abstractmethod
